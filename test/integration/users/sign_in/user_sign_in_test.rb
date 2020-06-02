@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class USER_SIGN_INTest < ActionDispatch::IntegrationTest
+class UserSignInTest < ActionDispatch::IntegrationTest
   setup
     @user = users :one
     @event = events :one
@@ -8,10 +8,20 @@ class USER_SIGN_INTest < ActionDispatch::IntegrationTest
     sign_in
   end
 
-  test "error message displayed" do
-
-
+test "user signed in successfully" do
+  sign_in do
+  assert_no_text("Invalid email or password.")
   end
+end
+
+test "error message displayed" do
+  page.find("#flash_alert")
+end
+
+test"error message has red background" do
+  page.has_css?('.alert-danger')
+end
+
 
 def sign_in
   visit root_path
