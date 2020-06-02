@@ -1,11 +1,9 @@
 require 'test_helper'
 
 class UserSignInTest < ActionDispatch::IntegrationTest
-  setup
+  setup do
     @user = users :one
     @event = events :one
-
-    sign_in
   end
 
 test "user signed in successfully" do
@@ -15,11 +13,14 @@ test "user signed in successfully" do
 end
 
 test "error message displayed" do
-  page.find("#flash_alert")
+  fail_sign_in do
+  page.find("div#flash_alert")
+  end
 end
-
 test"error message has red background" do
-  page.has_css?('.alert-danger')
+  fail_sign_in do
+  page.has_css?('.alert.alert-danger')
+  end
 end
 
 
@@ -32,4 +33,15 @@ def sign_in
   fill_in(id: 'user_password', with: 'user1234')
 
   click_on(class: 'form-control btn-primary')
+end
+
+  def fail_sign_in
+    visit root_path
+    click_on('Sign In', match: :first)
+
+    fill_in(id: 'user_email', with: 'wrong@wrong.com')
+    fill_in(id: 'user_password', with: 'wrong1234')
+
+    click_on(class: 'form-control btn-primary')
+  end
 end
