@@ -8,15 +8,11 @@ class UserVisitsHomePageTest < ActionDispatch::IntegrationTest
     sign_in
   end
 
-  #test "the truth" do
-  #  assert true
-  #end
-
   test "should go to home after clicking on home" do
   	within("div#globalNavbar.collapse.navbar-collapse") do
   		click_on('Home', match: :first)
   		assert_equal current_path, root_path
-  	end	
+  	end
   end
 
   test "should go to about page when clicking about in header"  do
@@ -29,23 +25,16 @@ class UserVisitsHomePageTest < ActionDispatch::IntegrationTest
   #dpc = discover previous conversations
   test "should go to dpc page when clicking on dpc in header"  do
   	within("div#globalNavbar.collapse.navbar-collapse") do
-  		click_on("Discover Previous Conversations", match: :first)
-  		assert_equal current_path, supportourwork_path
-  	end	
-  end 
-
-  test "should go to FAQ page when clicking on FAQ in header"  do
-  	within("div#globalNavbar.collapse.navbar-collapse") do
-  		click_on('FAQ', match: :first)
-  		assert_equal current_path, faq_path
-  	end	
-  end 
+  		click_on("Have us on your Podcast", match: :first)
+  		assert_equal current_path, drschaeferspeaking_path
+  	end
+  end
 
   test "should go to view profile after clicking on user name and clicking view profile"  do
   	click_on(class: "dropdown-toggle")
   	click_on("View Profile", match: :first)
   	assert_equal current_path, user_profile_path(@user.permalink)
-  end 
+  end
 
   test "should go to control panel after clicking on user name and clicking control panel"  do
   	click_on(class: "dropdown-toggle")
@@ -59,8 +48,8 @@ class UserVisitsHomePageTest < ActionDispatch::IntegrationTest
   end	
 
    test "should be able to host a live conversation" do
-    within("div.panel.panel-default") do
-      click_on("Host a Live Conversation", match: :first)
+    within("div#countdown_clock") do
+      click_on("Post your Own Conversation", match: :first)
       assert_equal current_path, new_event_path
     end 
   end  
