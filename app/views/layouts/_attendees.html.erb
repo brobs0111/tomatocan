@@ -1,0 +1,42 @@
+<% users = User.where('last_viewed @> ARRAY[?]::integer[]', [params[:event]]) %>
+<% current_user = User.find_by_id(params[:currentUser]) %>
+<% @user = User.find_by_id(params[:owner]) %>
+
+<% user_array = [] %>
+
+<% users.each do |user| %>
+  <% user =  User.find_by_id(user) %>
+  <% user_array << user %>
+<% end %>
+
+<% user_array = user_array.sort_by {|u| u.name} %>
+
+
+<div style="padding:10px 15px 7px 15px; font-size: 15px">
+  <% user_array.each do |user| %>
+    <div style="padding:8px 0px 0px 0px">
+      <% if user.profilepic.present? && user.profilepic != '' %>
+          <%= image_tag user.profilepic.url.to_s, :class => "img-circle", :id => "image", style: "line-height: 1.7; height: 1.7em; line-width: 1.7; width: 1.7em; margin-top: -5px" %>
+      <% else %>
+          <%= image_tag "logoDigitalHollow300.png", :class => "img-circle", :id => "image", style: "background-color:white; line-height: 1.7; height: 1.7em; line-width: 1.7; width: 1.7em; margin-top: -5px" %>
+      <% end %>
+      <% if user.name.length >= 16 %>
+        <% name = user.name[0..14] + "..." %> 
+        <a href="<%= request.base_url %>/<%= user.permalink %>"><%= name %></a>
+      <% else %>
+        <a id="attendeeName" href="<%= request.base_url %>/<%= user.permalink %>"><%= user.name %></a>
+      <% end %>
+    <% if current_user.permalink == @user.permalink && user.permalink != @user.permalink %>
+      <button id="block_button" style="float:right; margin-top:-3px" onclick="block('<%=user.name%>','<%=@user.id%>','<%=user.id%>')">Block</button>
+    <% end %>
+    </div>
+  <% end %>
+</div>
+
+<script>
+  function block(name, owner_id, block_id) {
+    if (confirm("Are you sure you want to block " + name + " from your page?")) {
+      $.post("/users/block", {owner: owner_id, to_block: block_id})
+    }
+  }
+</script>

@@ -14,22 +14,11 @@ class UsersController < ApplicationController
     @users =   userswithpicorder.paginate(:page => params[:page], :per_page => 32)
   end
 
-  def youtubers
-    userswithyoutube = User.where("LENGTH(youtube1) < ? AND LENGTH(youtube1) > ?", 20, 4)
-    usersvidorder = userswithyoutube.order('updated_at DESC')
-    @youtubers = usersvidorder.paginate(:page => params[:page], :per_page => 12)
-  end
-  def supportourwork
-    userswstripe = User.where("LENGTH(stripeid) > ? AND LENGTH(youtube1) > ?", 10, 7)
-    stripeorder = userswstripe.order('updated_at DESC')
-    @stripeusers = stripeorder.paginate(:page => params[:page], :per_page => 24)
-  end
-
   def show
     # @redirecturl = "https://connect.stripe.com/oauth/authorize?response_type=code&client_id=" + STRIPE_CONNECT_CLIENT_ID + "&scope=read_write"
     pdtnow = Time.now - 7.hours + 5.minutes
     id = @user.id
-    currconvo = Event.where( "start_at < ? AND end_at > ? AND usrid = ?", pdtnow, pdtnow, id ).first
+    currconvo = Event.where( "start_at < ? AND end_at > ? AND user_id = ?", pdtnow, pdtnow, id ).first
     if currconvo.present?
       @displayconvo = currconvo
     end
@@ -43,11 +32,20 @@ class UsersController < ApplicationController
         end
       end
     end
+
+
+    rsvps = Event.where('id IN (SELECT event_id FROM rsvpqs WHERE rsvpqs.user_id = ?) and start_at > ?', @user.id, pdtnow )
+    @rsvpevents = rsvps.where( "start_at > ?", pdtnow)
+
     userid = @user.id
-    upcomingevents = Event.where("start_at > ? AND usrid = ?", Time.now - 10.hours , userid).order('start_at ASC')
-    @events = upcomingevents.paginate(page: params[:page], :per_page => 4)
+
+    upcomingevents = Event.where("start_at > ? AND user_id = ?", Time.now - 10.hours , userid).order('start_at ASC')
+    @calendar_events = upcomingevents+rsvps.flat_map{ |e| e.calendar_events(e.start_at)}
+    @calendar_events = @calendar_events.sort_by {|event| event.start_at}
+    @calendar_events = @calendar_events.paginate(page: params[:page], :per_page => 5)
+
     respond_to do |format|
-      format.html # show.html.erb
+      format.html #show.html.erb
       format.json { render json: @user }
     end
   end
@@ -108,12 +106,12 @@ class UsersController < ApplicationController
     currtime = Time.now
     rsvps = Event.where('id IN (SELECT event_id FROM rsvpqs WHERE rsvpqs.user_id = ?)', @user.id)
     @rsvpevents = rsvps.where( "start_at > ?", currtime )
-    @events = Event.where( "start_at > ? AND usrid = ?", currtime, @user.id )
+    @events = Event.where( "start_at > ? AND user_id = ?", currtime, @user.id )
     respond_to do |format|
       format.html
       format.json { render json: @user }
     end
-    @pastevents = Event.where( "start_at < ? AND usrid = ?", currtime, @user.id )
+    @pastevents = Event.where( "start_at < ? AND user_id = ?", currtime, @user.id )
     rsvps = Event.where('id IN (SELECT event_id FROM rsvpqs WHERE rsvpqs.user_id = ?)', @user.id)
     @pastrsvps = rsvps.where( "start_at < ?", currtime )
     respond_to do |format|
@@ -164,8 +162,7 @@ class UsersController < ApplicationController
   # POST /users.json
   def create
     @user = User.new(user_params)
-    #    @user.latitude = request.location.latitude #geocoder has become piece of junk
-    #    @user.longitude = request.location.longitude
+
     if @user.save
       redirect_to new_user_session_path, success: "You have successfully signed up! An email has been sent for you to confirm your account."
       UserMailer.with(user: @user).welcome_email.deliver_later
@@ -207,13 +204,16 @@ class UsersController < ApplicationController
     end
   end
 
+  respond_to :js, :json, :html
 
   private
 
   def updateEmailMsg
-    unless current_user.email.eql? params[:user][:email]
-      flash[:info] = "A confirmation message for your new email has been sent to: " + params[:user][:email]
-      flash[:info] += " to save changes confirm email first"
+    if params[:user][:email] != nil
+      unless current_user.email.eql? params[:user][:email]
+        flash[:info] = "A confirmation message for your new email has been sent to: " + params[:user][:email]
+        flash[:info] += " to save changes confirm email first"
+      end
     end
   end
 
@@ -263,10 +263,13 @@ class UsersController < ApplicationController
       end
     end
     if @user.errors.messages[:permalink].present?
-      msg += ("Permalink " + @user.errors.messages[:permalink][0] + "\n")
+      msg += ("User name " + @user.errors.messages[:permalink][0] + "\n")
     end
     if @user.errors.messages[:password].present?
       msg += ("Password " + @user.errors.messages[:password][0] + "\n")
+    end
+    if @user.errors.messages[:password_confirmation].present?
+      msg += ("Password confirmation " + @user.errors.messages[:password_confirmation][0] + "\n")
     end
 
     return msg

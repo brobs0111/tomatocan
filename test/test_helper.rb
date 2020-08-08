@@ -9,7 +9,7 @@ require 'capybara/minitest'
 require 'selenium-webdriver'
 require 'simplecov'
 require './test/test_helper'
-
+require 'selenium/webdriver'
 #Simple cov used to generate a coverage report
 SimpleCov.start 'rails' do
   add_filter '/bin/'
@@ -18,13 +18,23 @@ SimpleCov.start 'rails' do
   add_filter '/test/' # for minitest
 end
 
+
+
 class ActionDispatch::IntegrationTest
+
   # Make the Capybara DSL available in all integration tests
   include Capybara::DSL
   # Make `assert_*` methods behave like Minitest assertions
   include Capybara::Minitest::Assertions
   fixtures :all
   Capybara::Screenshot.autosave_on_failure = false
+
+  #this is for visual webdriver comment out if you dont have chrome and selenium-webdriver installed
+  #Capybara.register_driver :chrome do |app|
+  #Capybara::Selenium::Driver.new(app, browser: :chrome)
+  #end
+  #this goes with selenium webdriver comment out if you dont have chrome and the driver downloaded
+  #Capybara.current_driver = :chrome
 
   setup do
     @card_number           = "4242424242424242"
@@ -33,10 +43,12 @@ class ActionDispatch::IntegrationTest
 
   def user_sign_in  user
    visit root_path
-   click_on class: 'btn btn-default'
-   fill_in id: 'user_email',    with:  "#{user.email}"
-   fill_in id: 'user_password', with:  "user1234"
-   click_on class: 'form-control btn-primary'
+   within ('.navbar-btn') do
+    click_on class: 'btn btn-default'
+  end
+  fill_in id: 'user_email',    with:  "#{user.email}"
+  fill_in id: 'user_password', with:  "user1234"
+  click_on class: 'form-control btn-primary'  
   end
 
   def card_information_entry
@@ -49,14 +61,16 @@ class ActionDispatch::IntegrationTest
 
   def user_sign_up user
     visit root_path
-    click_on class: 'btn btn-primary'
-    fill_in id: 'user_name', with: "#{user[:name]}"
-    fill_in id: 'user_email',    with:  "#{user[:email]}"
-    fill_in id: 'user_permalink', with: "#{user[:permalink]}"
-    fill_in id: 'user_password', with: "#{user[:password]}"
-    fill_in id: 'user_password_confirmation', with: "#{user[:password_confirmation]}"
+    within ('.navbar-btn') do
+      click_on class: 'btn btn-primary'
+    end
+      fill_in id: 'user_name', with: "#{user[:name]}"
+      fill_in id: 'user_email',    with:  "#{user[:email]}"
+      fill_in id: 'user_permalink', with: "#{user[:permalink]}"
+      fill_in id: 'user_password', with: "#{user[:password]}"
+      fill_in id: 'user_password_confirmation', with: "#{user[:password_confirmation]}"
 
-    click_on class: 'form-control btn-primary'
+      click_on class: 'form-control btn-primary'
   end
 
   # Reset sessions and driver between tests

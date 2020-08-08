@@ -30,15 +30,15 @@ class RsvpMailer < ApplicationMailer
 
     def set_url
         @event_url = event_url(host:'ThinQ.tv', id: @event.id)
-        @user_url = "https://thinqtv.herokuapp.com/" + User.find(@event.usrid).permalink
-        @share_url = "http://thinq.tv"
+        @user_url = "https://thinq.tv" + "/" + User.find(@event.user_id).permalink + "/viewer"
+        @share_url = "https://thinq.tv"
     end
 
     def format_content
         @start_date = Time.parse(@event.start_at.to_s)
         @date_subject_format = @start_date.strftime('%m/%d/%Y')
         @date_body_format = @start_date.strftime('%m/%d/%Y at ')
-        @event_owner = User.find(@event.usrid).name
+        @event_owner = User.find(@event.user_id).name
         @share_message = %W{
                                 #{@event_owner} is hosting a video conversation today at #{@time}. Come join us for a fun, thought
                                 provoking video conversation.

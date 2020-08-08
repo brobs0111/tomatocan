@@ -1,26 +1,23 @@
-//This file gives hierarchy to SASS files used on the site; this file and its @imports are added to the top of all other SCSS files.
-
-@import "styles/aboutus.scss";
 @import "styles/_faq.scss";
 @import "styles/_fellowship.scss";
+@import "styles/_home.scss";
 //The above sheets should be combined into 1 _staticpages.scss
 
 //Overrides Bootstrap-defined variables
 @import "base/variables.scss";
-
+$primary: #8C1D40;
+$baseFontFamily: Arial,Helvetica !default;
 //Bootstrap files
-@import "bootstrap-sprockets";
-@import "bootstrap";
-@import "font-awesome.css";
-@import "font-awesome";
+//@import "bootstrap-sprockets";
 
+@import "bootstrap";
+@import "font-awesome";
 //Global styles
 @import "base/globals.scss";
 @import "base/header.scss";
 @import "base/footer.scss";
 
 //Individual stylesheets loaded here
-@import "styles/home.scss";
 @import "styles/new.scss";
 @import "styles/users.scss";
 @import "styles/panels.scss";
@@ -28,8 +25,3 @@
 
 @import "styles/stripe-modal.scss";
 @import "calendar/styles.scss";
-
-
-
-
-

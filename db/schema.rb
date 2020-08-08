@@ -15,13 +15,6 @@ ActiveRecord::Schema.define(version: 201309200000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
-  create_table "banned_users", force: :cascade do |t|
-    t.integer "user_id"
-    t.integer "host_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
   create_table "books", id: :serial, force: :cascade do |t|
     t.string "title"
     t.text "blurb"
@@ -71,6 +64,9 @@ ActiveRecord::Schema.define(version: 201309200000000) do
     t.string "guest2_name"
     t.string "guest2_email"
     t.string "topic"
+    t.text "attending", default: [], array: true
+    t.text "recurring"
+    t.index ["start_at", "topic"], name: "index_events_on_start_at_and_topic", unique: true
   end
 
   create_table "friendly_id_slugs", id: :serial, force: :cascade do |t|
@@ -229,6 +225,9 @@ ActiveRecord::Schema.define(version: 201309200000000) do
     t.datetime "confirmed_at"
     t.datetime "confirmation_sent_at"
     t.string "unconfirmed_email"
+    t.text "blockedBy", default: [], array: true
+    t.text "BlockedUsers", default: [], array: true
+    t.integer "last_viewed", default: [], array: true
     t.index ["authentication_token"], name: "index_users_on_authentication_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["permalink"], name: "index_users_on_permalink", unique: true
@@ -237,6 +236,4 @@ ActiveRecord::Schema.define(version: 201309200000000) do
     t.index ["slug"], name: "index_users_on_slug", unique: true
   end
 
-  add_foreign_key "banned_users", "users", column: "host_id", on_delete: :cascade
-  add_foreign_key "banned_users", "users", on_delete: :cascade
 end
