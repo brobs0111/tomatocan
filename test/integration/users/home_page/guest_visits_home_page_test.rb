@@ -70,6 +70,18 @@ class GuestVisitsHomePageTest < ActionDispatch::IntegrationTest
     end 
   end
 
+  test "should have monthly view button" do
+    page.has_css?('Monthly View')
+  end
+
+  test "should have list view button" do
+    page.has_css?('List View')
+  end
+
+  test "should have daily view button" do
+    page.has_css?('Daily View')
+  end
+
   test "should go to Privacy page when clicking Privacy in footer"  do
     within("div#footer.row") do
       first(:xpath, "//a[@href='/privacy']").click

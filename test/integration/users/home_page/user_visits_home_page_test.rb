@@ -132,6 +132,18 @@ class UserVisitsHomePageTest < ActionDispatch::IntegrationTest
   	assert_equal current_path, root_path
   end
 
+  test "should have monthly view button" do
+    page.has_css?('Monthly View')
+  end
+
+  test "should have list view button" do
+    page.has_css?('List View')
+  end
+
+  test "should have daily view button" do
+    page.has_css?('Daily View')
+  end
+
    test "should be able to host a live conversation" do
     click_on("Post your Own Conversation", match: :first)
     assert_equal current_path, new_event_path
