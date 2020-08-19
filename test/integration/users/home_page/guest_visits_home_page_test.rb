@@ -71,16 +71,22 @@ class GuestVisitsHomePageTest < ActionDispatch::IntegrationTest
   end
 
   test "should have monthly view button" do
+    within("div.tabContainer.text-center") do
     page.has_css?('Monthly View')
-  end
+      end
+    end
 
   test "should have list view button" do
+    within("div.tabContainer.text-center") do
     page.has_css?('List View')
-  end
+      end
+    end
 
   test "should have daily view button" do
+    within("div.tabContainer.text-center") do
     page.has_css?('Daily View')
-  end
+      end
+    end
 
   test "should go to Privacy page when clicking Privacy in footer"  do
     within("div#footer.row") do

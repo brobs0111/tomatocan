@@ -133,15 +133,21 @@ class UserVisitsHomePageTest < ActionDispatch::IntegrationTest
   end
 
   test "should have monthly view button" do
-    page.has_css?('Monthly View')
+    within("div.tabContainer.text-center") do
+      page.has_css?('Monthly View')
+    end
   end
 
   test "should have list view button" do
-    page.has_css?('List View')
+    within("div.tabContainer.text-center") do
+      page.has_css?('List View')
+    end
   end
 
   test "should have daily view button" do
-    page.has_css?('Daily View')
+    within("div.tabContainer.text-center") do
+      page.has_css?('Daily View')
+    end
   end
 
    test "should be able to host a live conversation" do
