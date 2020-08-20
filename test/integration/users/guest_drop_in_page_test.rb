@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class UserVisitsHomePageTest < ActionDispatch::IntegrationTest
+class GuestDropInPageTest < ActionDispatch::IntegrationTest
   setup do
     @test_user = users :confirmedUser
     @event = events :one
@@ -13,6 +13,21 @@ class UserVisitsHomePageTest < ActionDispatch::IntegrationTest
       click_on("Daily View")
     end
   end
+
+  test "7 day of the week buttons should exist" do
+    assert_css("button.btn.btn-primary.weekBtn", count: 7)
+  end
+
+  test "should be 1 of each day Sunday, Monday, etc." do
+    assert_button("Sunday", count: 1)
+    assert_button("Monday", count: 1)
+    assert_button("Tuesday", count: 1)
+    assert_button("Wednesday", count: 1)
+    assert_button("Thursday", count: 1)
+    assert_button("Friday", count: 1)
+    assert_button("Saturday", count: 1)
+  end
+
 
   test "monthly view button should exist" do
     within("div.col-md-12.col-sm-12.col-xs-10.pl-0.ml-2.justify-content-center.pr-1") do
